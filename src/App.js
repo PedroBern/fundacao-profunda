@@ -21,6 +21,8 @@ import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Slider from '@material-ui/core/Slider';
+
 
 import tiposDeFundacoes from './utils/tiposDeFundacoes';
 import { tabelaKAlpha } from './utils/aokiVelloso';
@@ -40,6 +42,9 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     width: 200,
+  },
+  geometrico: {
+    flexDirection: 'column'
   },
   arranjo: {
     margin: theme.spacing(2, 0, 0, 0),
@@ -64,6 +69,9 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.default
   },
+  falha: {
+    backgroundColor: '#ed4b82'
+  },
   nested: {
     paddingLeft: theme.spacing(6),
     flexDirection: 'column',
@@ -74,6 +82,16 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
+  },
+  profundidade: {
+    flexDirection: 'column'
+  },
+  slider: {
+    maxWidth: 240,
+    margin: theme.spacing(4,0,4,0)
+  },
+  max: {
+    margin: theme.spacing(0,0,4,0)
   }
 }));
 
@@ -213,34 +231,36 @@ const soloInicial = [
     nspt: 33,
     h: 5,
     inicio: 15,
-    profundidade: 20,
+    profundidade: 20.05,
     k: 0.8,
     alpha: 2
   },
 ]
 
 const cargaPonta = (areaPonta, k, f1, nspt) => areaPonta * k * nspt / f1;
-const cargaLatetal = (solo, estaca, hEstaca, f2) => {
+const cargaLatetal = (solo, estaca, hEstaca, f2, quadrada) => {
   const tabela = solo.map(s => ({
     ...s,
-    u: estaca.quadrada ? estaca.secao * 4 : Math.PI * estaca.secao,
+    u: quadrada ? estaca.secao * 4 : Math.PI * estaca.secao,
     l: s.profundidade > hEstaca ? hEstaca - s.inicio : s.h
   })).filter(t => t.inicio <= hEstaca)
   const cargaLateral = tabela.reduce((acc, v, i) => {
     const sum = typeof acc === 'number' ? acc : 0;
     const carga = sum + v.u * v.l * v.k * v.nspt * v.alpha / (f2 * 100)
     return carga
-  });
+  }, 0);
   return cargaLateral
 }
 const camadaPonta = (h, solo) => solo.filter(s => s.inicio <= h && s.profundidade > h);
 
+// function valueLabelFormat(value) {
+//   return marks.findIndex(mark => mark.value === value) + 1;
+// }
 
 function App() {
 
   const classes = useStyles();
-  const [cargaCadaPilar, setCargaCadaPilar] = React.useState(2500 + 155);
-  const [cargaNominal, setCargaNominal] = React.useState(null);
+  const [cargaNominal, setCargaNominal] = React.useState((2500 + 155) * 2);
   const [arranjo, setArranjo] = React.useState(0)
   const [cargaAplicadaCadaEstaca, setCargaAplicadaCadaEstaca] = React.useState(null);
   const [estacas, setEstacas] = React.useState(null);
@@ -252,14 +272,10 @@ function App() {
   const handleChange = event => {
     const value = Number(event.target.value);
     if (value >= 0) {
-      setCargaCadaPilar(value);
+      setCargaNominal(value);
     }
     else alert('Apenas numero!')
   };
-
-  React.useEffect(() => {
-    setCargaNominal(cargaCadaPilar * 2);
-  }, [cargaCadaPilar]);
 
   React.useEffect(() => {
     const d = arranjos[arranjo].m * arranjos[arranjo].n;
@@ -301,10 +317,12 @@ function App() {
     if (checked) {
       const areaPonta = estacas[checked[0]].nome === 'Franki'
       ? 0.38
-      : Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2)
+      : estacas[checked[0]].quadrada
+        ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2)
+        : Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654
       const ultimaCamada = camadaPonta(profundidadeEstaca, solo)[0];
       const cP = cargaPonta(areaPonta, ultimaCamada.k, estacas[checked[0]].f1, ultimaCamada.nspt);
-      const cL = cargaLatetal(solo, estacas[checked[0]].variacoes[checked[1]], profundidadeEstaca, estacas[checked[0]].f2);
+      const cL = cargaLatetal(solo, estacas[checked[0]].variacoes[checked[1]], profundidadeEstaca, estacas[checked[0]].f2, estacas[checked[0]].quadrada);
       const pr = cP + cL;
       const pAdm = pr / 2 * 1000
       const pAdmCorrigida = arranjos[arranjo].felds
@@ -320,6 +338,10 @@ function App() {
     }
   }, [checked, solo, profundidadeEstaca])
 
+  const onChangeCommitted = (event, value) => {
+    setProfundidadeEstaca(value);
+  }
+
   return (
     <React.Fragment>
       <CssBaseline />
@@ -328,7 +350,7 @@ function App() {
           <Typography variant='h4' gutterBottom className={classes.title}>
             Projeto 2 de fundações
           </Typography>
-          <ExpansionPanel>
+          {/*<ExpansionPanel>
             <ExpansionPanelSummary
             expandIcon={<ExpandMoreIcon />}
               aria-controls="panel1a-content"
@@ -344,7 +366,7 @@ function App() {
                 <FormHelperText>Número de pilares</FormHelperText>
               </FormControl>
             </ExpansionPanelDetails>
-          </ExpansionPanel>
+          </ExpansionPanel>*/}
 
           <ExpansionPanel>
             <ExpansionPanelSummary
@@ -353,17 +375,17 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                2: Definir a carga em cada pilar.
+                1: Definir a carga.
               </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <FormControl className={clsx(classes.margin, classes.formControl)}>
                 <Input
-                  value={cargaCadaPilar}
+                  value={cargaNominal}
                   onChange={handleChange}
                   endAdornment={<InputAdornment position="end">kN</InputAdornment>}
                 />
-                <FormHelperText>Carga de cada pilar</FormHelperText>
+                <FormHelperText>Carga total</FormHelperText>
               </FormControl>
             </ExpansionPanelDetails>
           </ExpansionPanel>
@@ -375,10 +397,10 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                3: Definir o arranjo geométrico.
+                2: Definir o arranjo geométrico.
               </Typography>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            <ExpansionPanelDetails className={classes.geometrico}>
               <FormControl className={clsx(classes.margin, classes.formControl)}>
                 <NativeSelect
                   value={arranjo}
@@ -403,7 +425,7 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                4: Calcular a carga aplicada em cada estaca.
+                3: Calcular a carga aplicada em cada estaca.
               </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
@@ -426,7 +448,7 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                5: Filtrar entre os tipos de estacas, as que suportam a carga
+                4: Filtrar entre os tipos de estacas, as que suportam a carga
                 aplicada em cada pilar e selecionar a desejada.
               </Typography>
             </ExpansionPanelSummary>
@@ -436,7 +458,7 @@ function App() {
                 <List
                   className={classes.listaEstacas}
                   subheader={
-                  <ListSubheader component="div" id="nested-list-subheader">
+                  <ListSubheader>
                     Estacas aceitaveis
                     {arranjos[arranjo].felds ? ` - Eficiência (Felds) ${Math.round(arranjos[arranjo].felds * 10000)/100} %` : ''}
                   </ListSubheader>
@@ -483,14 +505,14 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                6: Definir os parametros K e alpha.
+                5: Definir os parametros K e alpha.
               </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <List
                 className={classes.listaEstacas}
                 subheader={
-                <ListSubheader component="div" id="nested-list-subheader">
+                <ListSubheader>
                   Parametros do solo
                 </ListSubheader>
               }>
@@ -539,17 +561,19 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                7: Definir a área da ponta
+                6: Definir a área da ponta
               </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <Typography variant='body1'>
                 {
-                  checked
-                  ? estacas[checked[0]].nome === 'Franki'
-                    ? '0.38 m² (bulbo de 180 l)'
-                    : `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 100 * Math.PI) / 100} m²`
-                  : 'Escolha uma estaca na estapa 5'
+                  !checked
+                  ? <span>Escolha uma estaca na estapa 4</span>
+                  : estacas[checked[0]].nome === 'Franki'
+                    ? <span>0.38 m² (bulbo de 180 l)</span>
+                    : estacas[checked[0]].quadrada
+                      ? `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao, 2) * 10000) / 10000} m²`
+                      : `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 10000) / 10000} m²`
                 }
               </Typography>
             </ExpansionPanelDetails>
@@ -562,50 +586,68 @@ function App() {
               id="panel1a-header"
             >
               <Typography variant='subtitle1'>
-                8: Definir a profundidade
+                7: Definir a profundidade
               </Typography>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <Typography variant='body1'>
-                {
-                  aoki &&
-                    <List
-                      className={classes.listaEstacas}
-                      subheader={
-                      <ListSubheader component="div" id="nested-list-subheader">
-                        Resultados
-                      </ListSubheader>
-                    }>
-                      <ListItem button>
-                        <ListItemText
-                          primary={`carga na ponta ${Math.round(aoki.cp,2)} kN`}
-                        />
-                      </ListItem>
-                      <ListItem button>
-                        <ListItemText
-                          primary={`carga lateral ${Math.round(aoki.cl,2)} kN`}
-                        />
-                      </ListItem>
-                      <ListItem button>
-                        <ListItemText
-                          primary={`capacidade de carga ${Math.round(aoki.pr,2)} kN`}
-                        />
-                      </ListItem>
-                      <ListItem button>
-                        <ListItemText
-                          primary={`carga admissivel ${Math.round(aoki.pAdm,2)} kN`}
-                        />
-                      </ListItem>
-                      <ListItem button>
-                        <ListItemText
-                          primary={`carga admissivel corrigida ${Math.round(aoki.pAdmCorrigida,2)} kN`}
-                        />
-                      </ListItem>
-                    </List>
-
-                }
-                {cargaAplicadaCadaEstaca}
-              </Typography>
+            <ExpansionPanelDetails className={classes.profundidade}>
+              <Slider
+                valueLabelDisplay="on"
+                getAriaValueText={
+                  function valuetext(value) {
+                    return `${value} m`;
+                  }}
+                className={classes.slider}
+                defaultValue={profundidadeEstaca}
+                step={0.05}
+                min={5}
+                max={20}
+                onChangeCommitted={onChangeCommitted}
+              />
+              { aoki && (
+                <Typography variant='body1' className={classes.max}>
+                  Carga máxima suportada por cada estaca: {Math.round(cargaAplicadaCadaEstaca, 2)} kN
+                </Typography>
+              )}
+              {
+                aoki ?
+                  <List
+                    className={
+                      clsx(classes.listaEstacas, {
+                        [classes.falha]: cargaAplicadaCadaEstaca > aoki.pAdmCorrigida
+                      })}
+                    subheader={
+                    <ListSubheader>
+                      Resultados
+                    </ListSubheader>
+                  }>
+                    <ListItem button>
+                      <ListItemText
+                        primary={`carga na ponta ${Math.round(aoki.cp,2)} kN`}
+                      />
+                    </ListItem>
+                    <ListItem button>
+                      <ListItemText
+                        primary={`carga lateral ${Math.round(aoki.cl,2)} kN`}
+                      />
+                    </ListItem>
+                    <ListItem button>
+                      <ListItemText
+                        primary={`capacidade de carga ${Math.round(aoki.pr,2)} kN`}
+                      />
+                    </ListItem>
+                    <ListItem button>
+                      <ListItemText
+                        primary={`carga admissivel ${Math.round(aoki.pAdm,2)} kN`}
+                      />
+                    </ListItem>
+                    <ListItem button>
+                      <ListItemText
+                        primary={`carga admissivel corrigida ${Math.round(aoki.pAdmCorrigida,2)} kN`}
+                      />
+                    </ListItem>
+                  </List>
+                : <Typography variant='body1'>Escolha uma estaca na etapa 4</Typography>
+              }
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
