@@ -305,7 +305,7 @@ const comparacao = (cargaNominal) => {
           : Math.pow(v.secao / 2, 2) * 3.14592654;
 
         let distancia = 24;
-        let bounds = [4, 30]
+        let bounds = [4, 20]
         let res = {};
         let h;
 
