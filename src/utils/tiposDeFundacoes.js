@@ -151,39 +151,39 @@ export default [
       },
     ]
   },
-  {
-    nome: 'Franki',
-    f1: 2.5,
-    f2: 5.0,
-    variacoes: [
-      {
-        secao: 0.35,
-        carga: 550,
-        d: 1.20,
-        a: 0.70,
-        comprimento: [3, 16],
-      },
-      {
-        secao: 0.40,
-        carga: 750,
-        d: 1.30,
-        a: 0.70,
-        comprimento: [3, 22],
-      },
-      {
-        secao: 0.52,
-        carga: 1300,
-        d: 1.50,
-        a: 0.80,
-        comprimento: undefined,
-      },
-      {
-        secao: 0.60,
-        carga: 1700,
-        d: 1.70,
-        a: 0.80,
-        comprimento: undefined,
-      },
-    ]
-  },
+  // {
+  //   nome: 'Franki',
+  //   f1: 2.5,
+  //   f2: 5.0,
+  //   variacoes: [
+  //     {
+  //       secao: 0.35,
+  //       carga: 550,
+  //       d: 1.20,
+  //       a: 0.70,
+  //       comprimento: [3, 16],
+  //     },
+  //     {
+  //       secao: 0.40,
+  //       carga: 750,
+  //       d: 1.30,
+  //       a: 0.70,
+  //       comprimento: [3, 22],
+  //     },
+  //     {
+  //       secao: 0.52,
+  //       carga: 1300,
+  //       d: 1.50,
+  //       a: 0.80,
+  //       comprimento: undefined,
+  //     },
+  //     {
+  //       secao: 0.60,
+  //       carga: 1700,
+  //       d: 1.70,
+  //       a: 0.80,
+  //       comprimento: undefined,
+  //     },
+  //   ]
+  // },
 ]
