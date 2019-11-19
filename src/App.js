@@ -304,10 +304,25 @@ const comparacao = (cargaNominal) => {
           ? Math.pow(v.secao / 2, 2)
           : Math.pow(v.secao / 2, 2) * 3.14592654;
 
-        let distancia = 16;
-        let bounds = [4, 20]
+        let distancia = 24;
+        let bounds = [4, 30]
         let res = {};
         let h;
+
+        function verify(h){
+          const ultimaCamada = camadaPonta(h, soloInicial)[0];
+          const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
+          const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
+          const pr = cP + cL;
+          const pAdm = pr / 2 * 1000
+          const pAdmCorrigida = pAdm * v.eficiencia
+          return cargaAplicadaCadaEstaca <= pAdmCorrigida;
+        }
+
+        const ok = verify(20);
+
+        if (!ok) return
+
         while (distancia > 0.05) {
           h = (bounds[0] + bounds[1]) / 2;
 
@@ -782,7 +797,7 @@ function App() {
                           return (`${Math.round(value * 100) / 100} m`)
                         }}
                         labelFormatter={(index) => {
-                          return comparativo[index].id
+                          return comparativo ? comparativo[index].id : index
                         }}
                       />
                       <Legend />
