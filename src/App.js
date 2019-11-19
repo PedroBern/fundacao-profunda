@@ -22,7 +22,7 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Slider from '@material-ui/core/Slider';
-
+import { BarChart, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer } from 'recharts';
 
 import tiposDeFundacoes from './utils/tiposDeFundacoes';
 import { tabelaKAlpha } from './utils/aokiVelloso';
@@ -45,6 +45,13 @@ const useStyles = makeStyles(theme => ({
   },
   geometrico: {
     flexDirection: 'column'
+  },
+  comparativo: {
+    height: 400,
+    width: '100%',
+    '& $div.recharts-responsive-container': {
+      marginLeft: -25
+    }
   },
   arranjo: {
     margin: theme.spacing(2, 0, 0, 0),
@@ -257,6 +264,92 @@ const camadaPonta = (h, solo) => solo.filter(s => s.inicio <= h && s.profundidad
 //   return marks.findIndex(mark => mark.value === value) + 1;
 // }
 
+const comparacao = (cargaNominal) => {
+  let comparacao = [];
+  arranjos.map(arranjo => {
+    const nEstacas = arranjo.m * arranjo.n;
+    const cargaAplicadaCadaEstaca = cargaNominal * 1.10 / nEstacas;
+    const tipos = tiposDeFundacoes.filter(tipo => (
+      tipo.variacoes.some(v => v.carga >= cargaAplicadaCadaEstaca)
+    )).map(tipo => ({
+      ...tipo,
+      variacoes: tipo.variacoes.filter(variante => (
+        variante.carga >= cargaAplicadaCadaEstaca
+      )).map(v => {
+        const e = !arranjo.felds ? {
+          eficiencia: converseLabarre(
+            v.secao,
+            v.d,
+            arranjo.m,
+            arranjo.n
+          ),
+          metodoEfeitoGrupo: 'labarre'
+        } : {
+          eficiencia: arranjo.felds,
+          metodoEfeitoGrupo: 'felds'
+        }
+        return {
+          ...v,
+          ...e
+        }
+      })
+    }))
+
+    tipos.map(tipo => {
+
+      tipo.variacoes.map(v => {
+        const areaPonta = tipo.nome === 'Franki'
+        ? 0.38
+        : tipo.quadrada
+          ? Math.pow(v.secao / 2, 2)
+          : Math.pow(v.secao / 2, 2) * 3.14592654;
+
+        let distancia = 16;
+        let bounds = [4, 20]
+        let res = {};
+        let h;
+        while (distancia > 0.05) {
+          h = (bounds[0] + bounds[1]) / 2;
+
+          const ultimaCamada = camadaPonta(h, soloInicial)[0];
+          const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
+          const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
+          const pr = cP + cL;
+          const pAdm = pr / 2 * 1000
+          const pAdmCorrigida = pAdm * v.eficiencia
+          res = {
+            cp: cP * 1000,
+            cl: cL * 1000,
+            pr: pr * 1000,
+            pAdm,
+            pAdmCorrigida
+          }
+
+          if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
+            bounds[1] = h;
+          }
+          else {
+            bounds[0] = h;
+          }
+          distancia = bounds[1] - bounds[0];
+        }
+
+        comparacao.push({
+          id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
+          profundidade: h,
+          nome: tipo.nome,
+          secao: v.secao,
+          arranjo: arranjo.nome,
+          ...res,
+        })
+      })
+
+    })
+
+  })
+  return comparacao;
+};
+
 function App() {
 
   const classes = useStyles();
@@ -268,6 +361,7 @@ function App() {
   const [solo, setSolo] = React.useState(soloInicial);
   const [profundidadeEstaca, setProfundidadeEstaca] = React.useState(10);
   const [aoki, setAoki] = React.useState(null);
+  const [comparativo, setComparativo] = React.useState(null);
 
   const handleChange = event => {
     const value = Number(event.target.value);
@@ -282,6 +376,22 @@ function App() {
     setCargaAplicadaCadaEstaca(cargaNominal * (1.1) / d );
     setChecked(null);
   }, [cargaNominal, arranjo]);
+
+  React.useEffect(() => {
+    const c = comparacao(cargaNominal)
+    setComparativo(
+      c.sort(function (a, b) {
+        if (a.profundidade > b.profundidade) {
+          return 1;
+        }
+        if (a.profundidade < b.profundidade) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      })
+    );
+  }, [cargaNominal]);
 
   React.useEffect(() => {
     const tipos = tiposDeFundacoes.filter(tipo => (
@@ -599,7 +709,7 @@ function App() {
                 className={classes.slider}
                 defaultValue={profundidadeEstaca}
                 step={0.05}
-                min={5}
+                min={4}
                 max={20}
                 onChangeCommitted={onChangeCommitted}
               />
@@ -651,6 +761,38 @@ function App() {
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
+          <ExpansionPanel>
+            <ExpansionPanelSummary
+            expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography variant='subtitle1'>
+                8: Comparativo
+              </Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <div className={classes.comparativo}>
+                {comparativo && (
+                  <ResponsiveContainer width='99%' height="90%">
+                    <BarChart data={comparativo}>
+                      <XAxis />
+                      <YAxis />
+                      <Tooltip formatter={(value, name, props) => {
+                          return (`${Math.round(value * 100) / 100} m`)
+                        }}
+                        labelFormatter={(index) => {
+                          return comparativo[index].id
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="profundidade" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
 
         </div>
