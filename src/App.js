@@ -309,20 +309,6 @@ const comparacao = (cargaNominal) => {
         let res = {};
         let h;
 
-        function verify(h){
-          const ultimaCamada = camadaPonta(h, soloInicial)[0];
-          const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
-          const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
-          const pr = cP + cL;
-          const pAdm = pr / 2 * 1000
-          const pAdmCorrigida = pAdm * v.eficiencia
-          return cargaAplicadaCadaEstaca <= pAdmCorrigida;
-        }
-
-        const ok = verify(20);
-
-        if (!ok) return
-
         while (distancia > 0.05) {
           h = (bounds[0] + bounds[1]) / 2;
 
@@ -788,7 +774,7 @@ function App() {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <div className={classes.comparativo}>
-                {comparativo && (
+                {comparativo && comparativo.length > 0 ? (
                   <ResponsiveContainer width='99%' height="90%">
                     <BarChart data={comparativo}>
                       <XAxis />
@@ -804,7 +790,11 @@ function App() {
                       <Bar dataKey="profundidade" fill="#8884d8" />
                     </BarChart>
                   </ResponsiveContainer>
-                )}
+                )
+                :
+                <Typography variant='body1'>Nenhum dado disponivel</Typography>
+              }
+
               </div>
             </ExpansionPanelDetails>
           </ExpansionPanel>
