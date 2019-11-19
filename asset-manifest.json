@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/fundacao-profunda/static/css/main.c2ed445e.chunk.css",
-    "main.js": "/fundacao-profunda/static/js/main.7182749b.chunk.js",
-    "main.js.map": "/fundacao-profunda/static/js/main.7182749b.chunk.js.map",
+    "main.js": "/fundacao-profunda/static/js/main.6064f932.chunk.js",
+    "main.js.map": "/fundacao-profunda/static/js/main.6064f932.chunk.js.map",
     "runtime-main.js": "/fundacao-profunda/static/js/runtime-main.d2a1c0f5.js",
     "runtime-main.js.map": "/fundacao-profunda/static/js/runtime-main.d2a1c0f5.js.map",
     "static/js/2.b251933e.chunk.js": "/fundacao-profunda/static/js/2.b251933e.chunk.js",
     "static/js/2.b251933e.chunk.js.map": "/fundacao-profunda/static/js/2.b251933e.chunk.js.map",
     "index.html": "/fundacao-profunda/index.html",
-    "precache-manifest.a4c3a58cdd51569ac0158ccbdc31ef84.js": "/fundacao-profunda/precache-manifest.a4c3a58cdd51569ac0158ccbdc31ef84.js",
+    "precache-manifest.0edc2295d5473f1ce2f5d44f007fcba4.js": "/fundacao-profunda/precache-manifest.0edc2295d5473f1ce2f5d44f007fcba4.js",
     "service-worker.js": "/fundacao-profunda/service-worker.js",
     "static/css/main.c2ed445e.chunk.css.map": "/fundacao-profunda/static/css/main.c2ed445e.chunk.css.map"
   },
@@ -16,6 +16,6 @@
     "static/js/runtime-main.d2a1c0f5.js",
     "static/js/2.b251933e.chunk.js",
     "static/css/main.c2ed445e.chunk.css",
-    "static/js/main.7182749b.chunk.js"
+    "static/js/main.6064f932.chunk.js"
   ]
 }
