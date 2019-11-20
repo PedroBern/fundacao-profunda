@@ -22,6 +22,11 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Slider from '@material-ui/core/Slider';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import { BarChart, XAxis, YAxis, Tooltip, Legend, Bar, ResponsiveContainer } from 'recharts';
 
 import tiposDeFundacoes from './utils/tiposDeFundacoes';
@@ -52,6 +57,13 @@ const useStyles = makeStyles(theme => ({
     '& $div.recharts-responsive-container': {
       marginLeft: -25
     }
+  },
+  tableRoot: {
+    width: '100%',
+    overflowX: 'auto',
+  },
+  table: {
+    minWidth: 550,
   },
   arranjo: {
     margin: theme.spacing(2, 0, 0, 0),
@@ -99,6 +111,9 @@ const useStyles = makeStyles(theme => ({
   },
   max: {
     margin: theme.spacing(0,0,4,0)
+  },
+  last: {
+    flexDirection: 'column'
   }
 }));
 
@@ -580,6 +595,8 @@ function App() {
                         <ListItemText
                           primary={estaca.nome}
                         />
+                        <ListItemText secondary={`F1: ${estaca.f1}`}/ >
+                        <ListItemText secondary={`F2: ${estaca.f2}`}/ >
                       </ListItem>
                       {estaca.variacoes.map((v, index) => (
                         <ListItem
@@ -772,7 +789,7 @@ function App() {
                 8: Comparativo
               </Typography>
             </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
+            <ExpansionPanelDetails className={classes.last}>
               <div className={classes.comparativo}>
                 {comparativo && comparativo.length > 0 ? (
                   <ResponsiveContainer width='99%' height="90%">
@@ -794,8 +811,41 @@ function App() {
                 :
                 <Typography variant='body1'>Nenhum dado disponivel</Typography>
               }
-
               </div>
+              {comparativo && comparativo.length > 0 && (
+                <div className={classes.tableRoot}>
+                  <Table className={classes.table} size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Estaca</TableCell>
+                        <TableCell align="right">Secao (m)</TableCell>
+                        <TableCell align="right">Arranjo</TableCell>
+                        <TableCell align="right">Profundidade (m)</TableCell>
+                        <TableCell align="right">Ponta (kN)</TableCell>
+                        <TableCell align="right">Lateral (kN)</TableCell>
+                        <TableCell align="right">PR (kN)</TableCell>
+                        <TableCell align="right">Padm (kN)</TableCell>
+                        <TableCell align="right">Padmc (kN)</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {comparativo.map(row => (
+                        <TableRow key={row.id}>
+                          <TableCell component="th" scope="row">{row.nome}</TableCell>
+                          <TableCell align="right">{row.secao}</TableCell>
+                          <TableCell align="right">{row.arranjo}</TableCell>
+                          <TableCell align="right">{Math.round(row.profundidade* 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.cp * 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.cl * 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.pr * 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.pAdm * 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.pAdmCorrigida * 100) / 100}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
