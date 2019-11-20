@@ -223,7 +223,7 @@ const soloInicial = [
   },
   {
     nome: "Argila arenosa",
-    nspt: 9,
+    nspt: 8,
     h: 3,
     inicio: 4,
     profundidade: 7,
@@ -278,6 +278,15 @@ const camadaPonta = (h, solo) => solo.filter(s => s.inicio <= h && s.profundidad
 // function valueLabelFormat(value) {
 //   return marks.findIndex(mark => mark.value === value) + 1;
 // }
+const makeDs = () => {
+  let a = [4];
+  while (a.length < 160) {
+    a.push(Math.round((a[a.length - 1] + 0.1) * 10) / 10)
+  }
+  return a
+}
+
+const ds = makeDs();
 
 const comparacao = (cargaNominal) => {
   let comparacao = [];
@@ -321,12 +330,10 @@ const comparacao = (cargaNominal) => {
 
         let distancia = 24;
         let bounds = [4, 20]
-        let res = {};
-        let h;
+        let res = {pAdmCorrigida: 0};
+        // let h;
 
-        while (distancia > 0.005) {
-          h = (bounds[0] + bounds[1]) / 2;
-
+        for (var h = 4.00; h < 20.1; h+=0.10) {
           const ultimaCamada = camadaPonta(h, soloInicial)[0];
           const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
           const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
@@ -342,23 +349,60 @@ const comparacao = (cargaNominal) => {
           }
 
           if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
-            bounds[1] = h;
+            comparacao.push({
+              id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
+              profundidade: h,
+              nome: tipo.nome,
+              secao: v.secao,
+              arranjo: arranjo.nome,
+              pAp: cargaAplicadaCadaEstaca,
+              ...res,
+            })
+            break
           }
-          else {
-            bounds[0] = h;
-          }
-          distancia = bounds[1] - bounds[0];
         }
 
-        comparacao.push({
-          id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
-          profundidade: h,
-          nome: tipo.nome,
-          secao: v.secao,
-          arranjo: arranjo.nome,
-          pAp: cargaAplicadaCadaEstaca,
-          ...res,
-        })
+        // while (
+        //   // res.pAdmCorrigida < cargaAplicadaCadaEstaca &&
+        //   distancia > 0.01
+        // ) {
+        //   h = (bounds[0] + bounds[1]) / 2 ;
+        //
+        //   const ultimaCamada = camadaPonta(h, soloInicial)[0];
+        //   // if (tipo.nome === 'Fuste circular' && v.secao === 0.5){
+        //   //   console.log(h, ultimaCamada.nspt);
+        //   // }
+        //   const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
+        //   const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
+        //   const pr = cP + cL;
+        //   const pAdm = pr / 2 * 1000
+        //   const pAdmCorrigida = pAdm * v.eficiencia
+        //   res = {
+        //     cp: cP * 1000,
+        //     cl: cL * 1000,
+        //     pr: pr * 1000,
+        //     pAdm,
+        //     pAdmCorrigida
+        //   }
+        //
+        //   if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
+        //     bounds[1] = h;
+        //   }
+        //   else {
+        //     bounds[0] = h;
+        //   }
+        //   distancia = bounds[1] - bounds[0];
+        // }
+
+        // comparacao.push({
+        //   id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
+        //   profundidade: h,
+        //   nome: tipo.nome,
+        //   secao: v.secao,
+        //   arranjo: arranjo.nome,
+        //   pAp: cargaAplicadaCadaEstaca,
+        //   ...res,
+        // })
       })
 
     })
