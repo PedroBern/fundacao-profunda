@@ -309,7 +309,7 @@ const comparacao = (cargaNominal) => {
         let res = {};
         let h;
 
-        while (distancia > 0.05) {
+        while (distancia > 0.005) {
           h = (bounds[0] + bounds[1]) / 2;
 
           const ultimaCamada = camadaPonta(h, soloInicial)[0];
@@ -709,7 +709,7 @@ function App() {
                   }}
                 className={classes.slider}
                 defaultValue={profundidadeEstaca}
-                step={0.05}
+                step={0.1}
                 min={4}
                 max={20}
                 onChangeCommitted={onChangeCommitted}
