@@ -275,19 +275,6 @@ const cargaLatetal = (solo, estaca, hEstaca, f2, quadrada) => {
 }
 const camadaPonta = (h, solo) => solo.filter(s => s.inicio <= h && s.profundidade > h);
 
-// function valueLabelFormat(value) {
-//   return marks.findIndex(mark => mark.value === value) + 1;
-// }
-const makeDs = () => {
-  let a = [4];
-  while (a.length < 160) {
-    a.push(Math.round((a[a.length - 1] + 0.1) * 10) / 10)
-  }
-  return a
-}
-
-const ds = makeDs();
-
 const comparacao = (cargaNominal) => {
   let comparacao = [];
   arranjos.map(arranjo => {
@@ -331,9 +318,43 @@ const comparacao = (cargaNominal) => {
         let distancia = 24;
         let bounds = [4, 20]
         let res = {pAdmCorrigida: 0};
-        // let h;
+        let h;
 
-        for (var h = 4.00; h < 20.1; h+=0.10) {
+        // for (var h = 4.00; h < 20.1; h+=0.10) {
+        //   const ultimaCamada = camadaPonta(h, soloInicial)[0];
+        //   const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
+        //   const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
+        //   const pr = cP + cL;
+        //   const pAdm = pr / 2 * 1000
+        //   const pAdmCorrigida = pAdm * v.eficiencia
+        //   res = {
+        //     cp: cP * 1000,
+        //     cl: cL * 1000,
+        //     pr: pr * 1000,
+        //     pAdm,
+        //     pAdmCorrigida
+        //   }
+        //
+        //   if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
+        //     comparacao.push({
+        //       id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
+        //       profundidade: h,
+        //       nome: tipo.nome,
+        //       secao: v.secao,
+        //       arranjo: arranjo.nome,
+        //       pAp: cargaAplicadaCadaEstaca,
+        //       ...res,
+        //     })
+        //     break
+        //   }
+        // }
+
+        while (
+          // res.pAdmCorrigida < cargaAplicadaCadaEstaca &&
+          distancia > 0.01
+        ) {
+          h = (bounds[0] + bounds[1]) / 2 ;
+
           const ultimaCamada = camadaPonta(h, soloInicial)[0];
           const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
           const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
@@ -349,60 +370,38 @@ const comparacao = (cargaNominal) => {
           }
 
           if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
-            comparacao.push({
-              id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
-              profundidade: h,
-              nome: tipo.nome,
-              secao: v.secao,
-              arranjo: arranjo.nome,
-              pAp: cargaAplicadaCadaEstaca,
-              ...res,
-            })
-            break
+            bounds[1] = h;
           }
+          else {
+            bounds[0] = h;
+          }
+          distancia = bounds[1] - bounds[0];
         }
 
-        // while (
-        //   // res.pAdmCorrigida < cargaAplicadaCadaEstaca &&
-        //   distancia > 0.01
-        // ) {
-        //   h = (bounds[0] + bounds[1]) / 2 ;
-        //
-        //   const ultimaCamada = camadaPonta(h, soloInicial)[0];
-        //   // if (tipo.nome === 'Fuste circular' && v.secao === 0.5){
-        //   //   console.log(h, ultimaCamada.nspt);
-        //   // }
-        //   const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
-        //   const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
-        //   const pr = cP + cL;
-        //   const pAdm = pr / 2 * 1000
-        //   const pAdmCorrigida = pAdm * v.eficiencia
-        //   res = {
-        //     cp: cP * 1000,
-        //     cl: cL * 1000,
-        //     pr: pr * 1000,
-        //     pAdm,
-        //     pAdmCorrigida
-        //   }
-        //
-        //   if (res.pAdmCorrigida >= cargaAplicadaCadaEstaca) {
-        //     bounds[1] = h;
-        //   }
-        //   else {
-        //     bounds[0] = h;
-        //   }
-        //   distancia = bounds[1] - bounds[0];
-        // }
+        h = Math.round(h * 10) / 10;
+        const ultimaCamada = camadaPonta(h, soloInicial)[0];
+        const cP = cargaPonta(areaPonta, ultimaCamada.k, tipo.f1, ultimaCamada.nspt);
+        const cL = cargaLatetal(soloInicial, v, h, tipo.f2, tipo.quadrada);
+        const pr = cP + cL;
+        const pAdm = pr / 2 * 1000
+        const pAdmCorrigida = pAdm * v.eficiencia
+        res = {
+          cp: cP * 1000,
+          cl: cL * 1000,
+          pr: pr * 1000,
+          pAdm,
+          pAdmCorrigida
+        }
 
-        // comparacao.push({
-        //   id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
-        //   profundidade: h,
-        //   nome: tipo.nome,
-        //   secao: v.secao,
-        //   arranjo: arranjo.nome,
-        //   pAp: cargaAplicadaCadaEstaca,
-        //   ...res,
-        // })
+        comparacao.push({
+          id: `${arranjo.nome} - ${tipo.nome} - ${v.secao}`,
+          profundidade: h,
+          nome: tipo.nome,
+          secao: v.secao,
+          arranjo: arranjo.nome,
+          pAp: cargaAplicadaCadaEstaca,
+          ...res,
+        })
       })
 
     })
