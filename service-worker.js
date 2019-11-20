@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/fundacao-profunda/precache-manifest.5cc443fa1c40242e010afd4b4e3f9cfa.js"
+  "/fundacao-profunda/precache-manifest.101df10805f82dd56a73e9b8a54ec11f.js"
 );
 
 self.addEventListener('message', (event) => {
