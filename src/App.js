@@ -215,9 +215,9 @@ const soloInicial = [
   {
     nome: "Argila siltosa",
     nspt: 3,
-    h: 3,
+    h: 4,
     inicio: 0,
-    profundidade: 3,
+    profundidade: 4,
     k: 0.25,
     alpha: 5.5
   },
@@ -225,8 +225,8 @@ const soloInicial = [
     nome: "Argila arenosa",
     nspt: 9,
     h: 3,
-    inicio: 3,
-    profundidade: 6,
+    inicio: 4,
+    profundidade: 7,
     k: 0.48,
     alpha: 4
   },
@@ -234,8 +234,8 @@ const soloInicial = [
     nome: "Areia argilosa",
     nspt: 14,
     h: 4,
-    inicio: 6,
-    profundidade: 10,
+    inicio: 7,
+    profundidade: 11,
     k: 0.53,
     alpha: 3
   },
@@ -243,8 +243,8 @@ const soloInicial = [
     nome: "Areia siltosa",
     nspt: 24,
     h: 5,
-    inicio: 10,
-    profundidade: 15,
+    inicio: 11,
+    profundidade: 16,
     k: 0.53,
     alpha: 1.9
   },
@@ -252,7 +252,7 @@ const soloInicial = [
     nome: "Areia siltosa",
     nspt: 33,
     h: 5,
-    inicio: 15,
+    inicio: 16,
     profundidade: 20.05,
     k: 0.8,
     alpha: 2
@@ -472,7 +472,7 @@ function App() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container maxWidth="md">
+      <Container maxWidth="lg">
         <div className={classes.root}>
           <Typography variant='h4' gutterBottom className={classes.title}>
             Projeto 2 de fundações
