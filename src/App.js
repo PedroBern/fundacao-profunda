@@ -821,7 +821,7 @@ function App() {
                         <TableCell>Estaca</TableCell>
                         <TableCell align="right">Secao (m)</TableCell>
                         <TableCell align="right">Arranjo</TableCell>
-                        <TableCell align="right">Profundidade (m)</TableCell>
+                        <TableCell align="right">h (m)</TableCell>
                         <TableCell align="right">Papl (kN)</TableCell>
                         <TableCell align="right">Ponta (kN)</TableCell>
                         <TableCell align="right">Lateral (kN)</TableCell>
