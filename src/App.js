@@ -356,6 +356,7 @@ const comparacao = (cargaNominal) => {
           nome: tipo.nome,
           secao: v.secao,
           arranjo: arranjo.nome,
+          pAp: cargaAplicadaCadaEstaca,
           ...res,
         })
       })
@@ -821,6 +822,7 @@ function App() {
                         <TableCell align="right">Secao (m)</TableCell>
                         <TableCell align="right">Arranjo</TableCell>
                         <TableCell align="right">Profundidade (m)</TableCell>
+                        <TableCell align="right">Papl (kN)</TableCell>
                         <TableCell align="right">Ponta (kN)</TableCell>
                         <TableCell align="right">Lateral (kN)</TableCell>
                         <TableCell align="right">PR (kN)</TableCell>
@@ -835,6 +837,7 @@ function App() {
                           <TableCell align="right">{row.secao}</TableCell>
                           <TableCell align="right">{row.arranjo}</TableCell>
                           <TableCell align="right">{Math.round(row.profundidade* 100) / 100}</TableCell>
+                          <TableCell align="right">{Math.round(row.pAp * 100) / 100}</TableCell>
                           <TableCell align="right">{Math.round(row.cp * 100) / 100}</TableCell>
                           <TableCell align="right">{Math.round(row.cl * 100) / 100}</TableCell>
                           <TableCell align="right">{Math.round(row.pr * 100) / 100}</TableCell>
