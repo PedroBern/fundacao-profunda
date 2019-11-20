@@ -125,7 +125,7 @@ const arranjos = [
     //   x       x
     nome: "Dupla de hexagonal",
     felds: 0.5832,
-    m: 4,
+    m: 6,
     n: 2,
     coords: [
          [1.5,1],      [3.5,1],
