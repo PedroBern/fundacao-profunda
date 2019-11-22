@@ -173,6 +173,44 @@ const arranjos = [
       [1,3],[2,3],[3,3],[4,3],
     ]
   },
+  {
+    // x    x
+    nome: "Linha de dois",
+    m: 1,
+    n: 2,
+    coords: [
+      [1,1], [2,1]
+    ]
+  },
+  {
+    // x    x    x
+    nome: "Linha de três",
+    m: 1,
+    n: 3,
+    coords: [
+      [1,1], [2,1], [3,1]
+    ]
+  },
+  {
+    // x    x    x
+    // x    x    x
+    nome: "Dupla de três",
+    m: 2,
+    n: 3,
+    coords: [
+      [1,1], [2,1], [3,1],
+      [1,2], [2,2], [3,2]
+    ]
+  },
+  {
+    // x    x    x    x
+    nome: "Linha de quatro",
+    m: 1,
+    n: 4,
+    coords: [
+      [1,1], [2,1], [3,1], [4,1]
+    ]
+  }
 ];
 
 const useStyles1 = makeStyles(theme => ({
@@ -310,7 +348,7 @@ const comparacao = (cargaNominal) => {
 
       tipo.variacoes.map(v => {
         const areaPonta = tipo.nome === 'Franki'
-        ? 0.38
+        ? Math.pow(v.secao / 2, 2) * 3.14592654 * 2
         : tipo.quadrada
           ? Math.pow(v.secao / 2, 2)
           : Math.pow(v.secao / 2, 2) * 3.14592654;
@@ -400,6 +438,7 @@ const comparacao = (cargaNominal) => {
           secao: v.secao,
           arranjo: arranjo.nome,
           pAp: cargaAplicadaCadaEstaca,
+          nEstacas: nEstacas,
           ...res,
         })
       })
@@ -486,7 +525,7 @@ function App() {
   React.useEffect(() => {
     if (checked) {
       const areaPonta = estacas[checked[0]].nome === 'Franki'
-      ? 0.38
+      ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 2
       : estacas[checked[0]].quadrada
         ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2)
         : Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654
@@ -629,11 +668,19 @@ function App() {
                   className={classes.listaEstacas}
                   subheader={
                   <ListSubheader>
-                    Estacas aceitaveis
-                    {arranjos[arranjo].felds ? ` - Eficiência (Felds) ${Math.round(arranjos[arranjo].felds * 10000)/100} %` : ''}
+                    {estacas.length > 0 ?
+                      <React.Fragment>
+                      Estacas aceitaveis
+                      {arranjos[arranjo].felds ? ` - Eficiência (Felds) ${Math.round(arranjos[arranjo].felds * 10000)/100} %` : ''}
+                      </React.Fragment>
+                      :
+                      <React.Fragment>
+                      Não há estacas que suportem essa combinação de arranjo e carga, tente escolher um arranjo para com mais estacas.
+                      </React.Fragment>
+                    }
                   </ListSubheader>
                 }>
-                  {estacas.map((estaca, estIndex) => (
+                  {estacas.length > 0 && estacas.map((estaca, estIndex) => (
                     <React.Fragment key={estaca.nome}>
                       <ListItem button key={estaca.nome}>
                         <ListItemText
@@ -742,7 +789,11 @@ function App() {
                   !checked
                   ? <span>Escolha uma estaca na estapa 4</span>
                   : estacas[checked[0]].nome === 'Franki'
-                    ? <span>0.38 m² (bulbo de 180 l)</span>
+                    ? <Typography variant='body1'>
+                      No caso de estacas Franki, a área da ponta é equivalente a 2 vezes
+                      a área da secão da estaca =
+                      {` ${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 2 * 10000) / 10000} m²`}
+                      </Typography>
                     : estacas[checked[0]].quadrada
                       ? `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao, 2) * 10000) / 10000} m²`
                       : `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 10000) / 10000} m²`
@@ -856,14 +907,20 @@ function App() {
                 <Typography variant='body1'>Nenhum dado disponivel</Typography>
               }
               </div>
+              <Typography variant='h6' gutterBottom>
+                No caso de estacas Franki, a área da ponta é equivalente a 2 vezes
+                a área da secão da estaca.
+              </Typography>
               {comparativo && comparativo.length > 0 && (
                 <div className={classes.tableRoot}>
                   <Table className={classes.table} size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Estaca</TableCell>
+                        <TableCell>#</TableCell>
+                        <TableCell align="right">Estaca</TableCell>
                         <TableCell align="right">Secao (m)</TableCell>
                         <TableCell align="right">Arranjo</TableCell>
+                        <TableCell align="right">Estacas</TableCell>
                         <TableCell align="right">h (m)</TableCell>
                         <TableCell align="right">Papl (kN)</TableCell>
                         <TableCell align="right">Ponta (kN)</TableCell>
@@ -874,18 +931,20 @@ function App() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {comparativo.map(row => (
+                      {comparativo.map((row, index) => (
                         <TableRow key={row.id}>
-                          <TableCell component="th" scope="row">{row.nome}</TableCell>
+                          <TableCell component="th" scope="row">{index}</TableCell>
+                          <TableCell align="right">{row.nome}</TableCell>
                           <TableCell align="right">{row.secao}</TableCell>
                           <TableCell align="right">{row.arranjo}</TableCell>
-                          <TableCell align="right">{Math.round(row.profundidade* 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.pAp * 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.cp * 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.cl * 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.pr * 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.pAdm * 100) / 100}</TableCell>
-                          <TableCell align="right">{Math.round(row.pAdmCorrigida * 100) / 100}</TableCell>
+                          <TableCell align="right">{row.nEstacas}</TableCell>
+                          <TableCell align="right">{row.profundidade}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.pAp)}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.cp)}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.cl)}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.pr)}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.pAdm)}</TableCell>
+                          <TableCell align="right">{Math.ceil(row.pAdmCorrigida)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
