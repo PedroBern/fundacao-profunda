@@ -348,7 +348,7 @@ const comparacao = (cargaNominal) => {
 
       tipo.variacoes.map(v => {
         const areaPonta = tipo.nome === 'Franki'
-        ? Math.pow(v.secao / 2, 2) * 3.14592654 * 2
+        ? Math.pow(v.secao * 0.9, 2) * 3.14592654
         : tipo.quadrada
           ? Math.pow(v.secao / 2, 2)
           : Math.pow(v.secao / 2, 2) * 3.14592654;
@@ -525,7 +525,7 @@ function App() {
   React.useEffect(() => {
     if (checked) {
       const areaPonta = estacas[checked[0]].nome === 'Franki'
-      ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 2
+      ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao * 0.9, 2) * 3.14592654
       : estacas[checked[0]].quadrada
         ? Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2)
         : Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654
@@ -790,9 +790,8 @@ function App() {
                   ? <span>Escolha uma estaca na estapa 4</span>
                   : estacas[checked[0]].nome === 'Franki'
                     ? <Typography variant='body1'>
-                      No caso de estacas Franki, a área da ponta é equivalente a 2 vezes
-                      a área da secão da estaca =
-                      {` ${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao / 2, 2) * 3.14592654 * 2 * 10000) / 10000} m²`}
+                      No caso de estacas Franki, a área da ponta é equivalente a circunferencia de raio igual a 90% do diâmetro da secão da estaca =
+                      {` ${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao * 0.9, 2) * 3.14592654 * 10000) / 10000} m²`}
                       </Typography>
                     : estacas[checked[0]].quadrada
                       ? `${Math.round(Math.pow(estacas[checked[0]].variacoes[checked[1]].secao, 2) * 10000) / 10000} m²`
@@ -908,8 +907,7 @@ function App() {
               }
               </div>
               <Typography variant='h6' gutterBottom>
-                No caso de estacas Franki, a área da ponta é equivalente a 2 vezes
-                a área da secão da estaca.
+                No caso de estacas Franki, a área da ponta é equivalente a circunferencia de raio igual a 90% do diâmetro da secão da estaca.
               </Typography>
               {comparativo && comparativo.length > 0 && (
                 <div className={classes.tableRoot}>
